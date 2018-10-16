@@ -2,20 +2,25 @@ package com.huyingbao.geoquiz;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * 答题测试界面
- * activity负责管理用户与应用界面的交互
+ * activity负责管理用户与应用界面的交互,任何时候只能有一个activity处于用户能交互的运行状态
+ * <p>
  * Android包名遵循DNS反转约定,保证包名称的唯一性
- * MVC的架构模式
- * 控制器对象包含有应用的逻辑单元,是视图对象与模型对象的联系纽带.
- * 控制器对象响应视图对象触发的各类事件,
- * 管理着模型对象与视图层间的数据流动
+ * <p>
+ * Android依靠res子目录的配置修饰符定位最佳资源以匹配当前设备配置
+ * <p>
+ * 控制器对象包含有应用的逻辑单元,是视图对象与模型对象的联系纽带
+ * <p>
+ * 控制器对象响应视图对象触发的各类事件, 管理着模型对象与视图层间的数据流动
  */
 public class QuizActivity extends AppCompatActivity {
+    private static final String TAG = "QuizActivity";
+    private static final String KEY_INDEX = "index";
     private Button mTrueButton;
     private Button mFalseButton;
     private Button mNextButton;
@@ -38,19 +43,26 @@ public class QuizActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate(Bundle) called");
+        setTitle(R.string.app_name);
+
         //根据传入的布局资源ID参数
         //该方法生成指定布局的视图并将其放置在屏幕上
         //布局视图生成后,布局文件包含的组件也随之以各自的属性定义完成实例化
-        setContentView(R.layout.activity_quiz);
         //布局是一种资源
         //资源是应用非代码形式的内容
         //使用资源ID在代码中获取对应的资源
-        setTitle(R.string.app_name);
+        setContentView(R.layout.activity_quiz);
 
         mTrueButton = findViewById(R.id.true_button);
         mFalseButton = findViewById(R.id.false_button);
         mNextButton = findViewById(R.id.next_button);
         mQuestionTextView = findViewById(R.id.question_text_view);
+
+        //检查存储的bundle信息
+        if (savedInstanceState != null) {
+            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+        }
 
         //初始化数据
         updateQuestion();
@@ -71,6 +83,49 @@ public class QuizActivity extends AppCompatActivity {
             mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;//索引加1,防止数组越界
             updateQuestion();
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume() called");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause() called");
+    }
+
+    /**
+     * 1:设备旋转
+     * 2:系统需要回收内存时
+     * 调用该方法时,用户数据随即被保存在 Bundle 对象中,然后操作系统将 Bundle 对象放入activity记录中
+     * 该方法通常在 onStop() 方法之前由系统调用,除非用户按后退键
+     * 通过其他方式保存定制类对象,在bundle中保存标识对象的基本数据类型
+     * Android从不会为了回收内存,而去销毁可见的activity
+     * @param outState
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState() called");
+        outState.putInt(KEY_INDEX, mCurrentIndex);
+    }
+
+    /**
+     * 只有在调用过 onStop() 并执行完成后,activity才会被标为可销毁.
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop() called");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy() called");
     }
 
     /**
