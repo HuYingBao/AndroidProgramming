@@ -1,6 +1,8 @@
 package com.huyingbao.geoquiz;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Button;
@@ -17,16 +19,21 @@ import android.widget.Toast;
  * 控制器对象包含有应用的逻辑单元,是视图对象与模型对象的联系纽带
  * <p>
  * 控制器对象响应视图对象触发的各类事件, 管理着模型对象与视图层间的数据流动
+ * <p>
+ * ActivityManager维护着一个非特定应用独享的回退栈
  */
 public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final int REQUEST_CODE_CHEAT = 0;
     private Button mTrueButton;
     private Button mFalseButton;
     private Button mNextButton;
+    private Button mCheatButton;
     private TextView mQuestionTextView;
 
     private int mCurrentIndex = 0;
+    private boolean mIsCheater;
 
     /**
      * 问题数组
@@ -57,6 +64,7 @@ public class QuizActivity extends AppCompatActivity {
         mTrueButton = findViewById(R.id.true_button);
         mFalseButton = findViewById(R.id.false_button);
         mNextButton = findViewById(R.id.next_button);
+        mCheatButton = findViewById(R.id.cheat_button);
         mQuestionTextView = findViewById(R.id.question_text_view);
 
         //检查存储的bundle信息
@@ -81,7 +89,15 @@ public class QuizActivity extends AppCompatActivity {
         });
         mNextButton.setOnClickListener(v -> {
             mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;//索引加1,防止数组越界
+            mIsCheater = false;
             updateQuestion();
+        });
+        mCheatButton.setOnClickListener(v -> {
+            //intent 对象是component用来与操作系统通信的一种媒介工具
+            Intent intent = CheatActivity.newIntent(this, mQuestionBank[mCurrentIndex].isAnswerTrue());
+            //调用请求发送给了系统的ActivityManager
+            //ActivityManager负责创建Activity实例并调用其onCreate(Bundle)方法
+            startActivityForResult(intent, REQUEST_CODE_CHEAT);
         });
     }
 
@@ -89,6 +105,18 @@ public class QuizActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume() called");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK) return;
+        switch (requestCode) {
+            case REQUEST_CODE_CHEAT:
+                if (data == null) return;
+                mIsCheater = CheatActivity.wasAnswerShown(data);
+                break;
+        }
     }
 
     @Override
@@ -160,7 +188,8 @@ public class QuizActivity extends AppCompatActivity {
      */
     private void checkAnswer(boolean userPressedTrue) {
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
-        int messageResId = userPressedTrue == answerIsTrue ? R.string.correct_toast : R.string.incorrect_toast;
+        int messageResId = mIsCheater ? R.string.judgment_toast :
+                userPressedTrue == answerIsTrue ? R.string.correct_toast : R.string.incorrect_toast;
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
     }
 }

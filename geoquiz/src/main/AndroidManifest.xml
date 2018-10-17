@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--manifest配置文件是一个包含元数据的XML文件，用来向Android操作系统描述应用-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.huyingbao.geoquiz">
 
@@ -15,6 +15,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".CheatActivity"></activity>
     </application>
 
 </manifest>
