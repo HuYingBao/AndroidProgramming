@@ -8,7 +8,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/geoquiz" />
+            <option value="$PROJECT_DIR$/criminalintent" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
