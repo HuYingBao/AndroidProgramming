@@ -100,10 +100,19 @@ public class QuizActivity extends AppCompatActivity {
     /**
      * 1:设备旋转
      * 2:系统需要回收内存时
-     * 调用该方法时,用户数据随即被保存在 Bundle 对象中,然后操作系统将 Bundle 对象放入activity记录中
+     * <p>
      * 该方法通常在 onStop() 方法之前由系统调用,除非用户按后退键
-     * 通过其他方式保存定制类对象,在bundle中保存标识对象的基本数据类型
+     * <p>
+     * 调用该方法时,用户数据随即被保存在 Bundle 对象中,然后操作系统将 Bundle 对象放入activity记录中
+     * activity暂存之后,Activity对象不再存在,但操作系统会将activity记录对象保存起来,
+     * 在需要恢复activity时,操作系统可以使用暂存的记录重新激活activity
+     * <p>
+     * 用户按了后退键后，系统会彻底销毁当前的activity。此时，暂存的activity记录同时被清除。
+     * <p>
      * Android从不会为了回收内存,而去销毁可见的activity
+     * <p>
+     * 通过其他方式保存定制类对象,在bundle中保存标识对象的基本数据类型
+     *
      * @param outState
      */
     @Override
@@ -114,7 +123,9 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     /**
-     * 只有在调用过 onStop() 并执行完成后,activity才会被标为可销毁.
+     * 只有在调用过 onStop() 并执行完成后,activity才会被标为可销毁
+     * 覆盖 onStop() 方法,保存永久性数据,如用户编辑的文字等
+     * onStop() 方法调用完,activity随时会被系统销毁,所以用它保存永久性数据
      */
     @Override
     protected void onStop() {
@@ -122,6 +133,9 @@ public class QuizActivity extends AppCompatActivity {
         Log.d(TAG, "onStop() called");
     }
 
+    /**
+     * activity进入暂存状态并不一定需要调用 onDestroy() 方法
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -130,8 +144,12 @@ public class QuizActivity extends AppCompatActivity {
 
     /**
      * 更新问题
+     * 记录栈跟踪的诊断性日志
      */
     private void updateQuestion() {
+        //可以创建一个全新的 Exception ，把它作为不抛出的异常对象传入该方法。
+        //借此，我们得到异常发生位置的记录报告。
+        Log.d(TAG, "Updating question text ", new Exception());
         mQuestionTextView.setText(mQuestionBank[mCurrentIndex].getTextResId());
     }
 
