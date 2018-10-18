@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.huyingbao.criminalintent.model.Crime;
+
 
 public class CrimeFragment extends Fragment {
     private EditText mTitleField;

@@ -1,4 +1,4 @@
-package com.huyingbao.criminalintent;
+package com.huyingbao.criminalintent.model;
 
 import java.util.Date;
 import java.util.UUID;
