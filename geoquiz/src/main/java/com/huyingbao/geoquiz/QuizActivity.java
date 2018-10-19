@@ -97,6 +97,8 @@ public class QuizActivity extends AppCompatActivity {
             Intent intent = CheatActivity.newIntent(this, mQuestionBank[mCurrentIndex].isAnswerTrue());
             //调用请求发送给了系统的ActivityManager
             //ActivityManager负责创建Activity实例并调用其onCreate(Bundle)方法
+            //ActivityManager负责跟踪管理activity父子关系,回传数据后,子activity被销毁,
+            //ActivityManager知道接收数据的是哪个activity
             startActivityForResult(intent, REQUEST_CODE_CHEAT);
         });
     }
@@ -107,6 +109,12 @@ public class QuizActivity extends AppCompatActivity {
         Log.d(TAG, "onResume() called");
     }
 
+    /**
+     * ActivityManager在子activity被销毁后调用的父activity方法.
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
