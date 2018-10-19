@@ -14,4 +14,9 @@ public class CrimeListActivity extends SingleFragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

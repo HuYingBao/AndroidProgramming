@@ -1,6 +1,9 @@
 <resources>
 
     <!-- Base application theme. -->
+    <!--Theme.AppCompat:黑色主题-->
+    <!--Theme.AppCompat.Light:浅色主题-->
+    <!--Theme.AppCompat.Light.DarkActionBar:带黑色工具栏的浅色主题-->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>

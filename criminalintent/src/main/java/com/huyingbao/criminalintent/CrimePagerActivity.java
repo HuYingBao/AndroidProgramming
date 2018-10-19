@@ -15,6 +15,24 @@ import com.huyingbao.criminalintent.model.CrimeLab;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 后退键导航:又称为临时性导 只能返回到上一次浏览过的用户界面 回退栈activity之间跳转
+ * 层级式导航:可以在应用内逐级向上导航
+ * 内部实现机制不一样
+ * <p>
+ * 点击向上按钮会调用如下代码
+ * Intent intent = new Intent(this,CrimeListActivity.class);
+ * intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+ * startActivity(intent);
+ * finish();
+ * <p>
+ * FLAG_ACTIVITY_CLEAR_TOP指示Android在回退栈中寻找指定的activity实例,
+ * <p>
+ * 如果实例存在,则弹出栈内所有其他activity,让启动的目标activity显示在栈顶
+ * 导航回退的目标activity会被先销毁再完全重建
+ * <p>
+ * 向上导航的机制需要被覆盖
+ */
 public class CrimePagerActivity extends AppCompatActivity {
 
     private static final String EXTRA_CRIME_ID = "crime_id";

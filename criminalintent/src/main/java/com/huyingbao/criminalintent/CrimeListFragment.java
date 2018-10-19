@@ -4,10 +4,15 @@ package com.huyingbao.criminalintent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -24,8 +29,18 @@ import java.util.List;
  * 没有setResult(...)方法
  */
 public class CrimeListFragment extends Fragment {
+    private static final String SAVE_SUBTITLE_VISIBLE = "subtitle_visible";
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mCrimeAdapter;
+    private boolean mSubtitleVisible;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //告诉FragmentManager:其管理的fragment应接收onCreateOptionsMenu(...)方法的调用指令.
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,6 +53,10 @@ public class CrimeListFragment extends Fragment {
         //LayoutManager任务:1在屏幕上摆放列表项,2负责定义屏幕滚动行为
         //RecyclerView能转发触摸事件,也可以通过ViewHolder监听用户触摸事件
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        //旋转屏幕需要
+        if (savedInstanceState != null) {
+            mSubtitleVisible = savedInstanceState.getBoolean(SAVE_SUBTITLE_VISIBLE);
+        }
         updateUI();
         return view;
     }
@@ -46,6 +65,57 @@ public class CrimeListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         updateUI();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVE_SUBTITLE_VISIBLE, mSubtitleVisible);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        //菜单布局文件名同界面布局文件名
+        inflater.inflate(R.menu.fragment_crime_list, menu);
+        MenuItem subtitleItem = menu.findItem(R.id.show_subtitle);
+        if (mSubtitleVisible) {
+            subtitleItem.setTitle(R.string.hide_subtitle);
+        } else {
+            subtitleItem.setTitle(R.string.show_subtitle);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.new_crime:
+                Crime crime = new Crime();
+                CrimeLab.get(getContext()).addCrime(crime);
+                Intent intent = CrimePagerActivity.newIntent(getContext(), crime.getId());
+                startActivity(intent);
+                //完成菜单项事件处理,返回true表明任务已经完成
+                return true;
+            case R.id.show_subtitle:
+                mSubtitleVisible = !mSubtitleVisible;
+                //通知menu菜单刷新
+                getActivity().invalidateOptionsMenu();
+                updateSubtitle();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void updateSubtitle() {
+        CrimeLab crimeLab = CrimeLab.get(getContext());
+        int crimeCount = crimeLab.getCrimes().size();
+        String subtitle = getResources().getQuantityString(R.plurals.subtitle_plurals,
+                crimeCount, crimeCount);
+        //实现菜单项标题与子标题的联动
+        if (!mSubtitleVisible) subtitle = null;
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.getSupportActionBar().setSubtitle(subtitle);
     }
 
     private void updateUI() {
@@ -57,6 +127,7 @@ public class CrimeListFragment extends Fragment {
         } else {
             mCrimeAdapter.notifyDataSetChanged();
         }
+        updateSubtitle();
     }
 
 
