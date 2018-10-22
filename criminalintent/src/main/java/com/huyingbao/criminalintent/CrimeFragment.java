@@ -2,11 +2,16 @@ package com.huyingbao.criminalintent;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +34,11 @@ public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "dialog_date";
     private static final int REQUEST_DATE = 0;
+    private static final int REQUEST_CONTACT = 1;
     private EditText mTitleField;
     private Button mDateButton;
+    private Button mReportButton;
+    private Button mSuspectButton;
     private CheckBox mSolvedCheckBox;
     private Crime mCrime;
 
@@ -104,6 +112,28 @@ public class CrimeFragment extends Fragment {
         mSolvedCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             mCrime.setSolved(isChecked);
         });
+
+        //启动一个隐式Intent 发送消息
+        mReportButton = view.findViewById(R.id.crime_report);
+        mReportButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            //EXTRA信息使用Intent类中定义的常量,任何响应该intent的activity都知道这些常量
+            intent.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
+            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
+            //创建一个选择器显示响应隐式intent的全部activity
+            intent = Intent.createChooser(intent, getString(R.string.send_report));
+            startActivity(intent);
+        });
+        //启动一个隐式Intent来选择联系人
+        final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        mSuspectButton = view.findViewById(R.id.crime_suspect);
+        mSuspectButton.setOnClickListener(v -> {
+            startActivityForResult(pickContact, REQUEST_CONTACT);
+        });
+        if (mCrime.getSuspect() != null) {
+            mSuspectButton.setText(mCrime.getSuspect());
+        }
         return view;
     }
 
@@ -124,10 +154,75 @@ public class CrimeFragment extends Fragment {
                 mCrime.setDate(date);
                 updateDate();
                 break;
+            case REQUEST_CONTACT:
+                //获取联系人姓名
+                //联系人应用有使用联系人数据库的全部权限
+                //联系人应用返回包含在intent中的URI数据该父activity时,
+                //会添加一个Intent.FLAG_GRANT_READ_URI_PERMISSION标志
+                //该标志告诉Android应用的父activity可以使用联系人数据一次
+                //我们不需要访问整个数据库,只需要访问其中的一条联系人信息
+                //ACTION_PICK启动activity并要求返回,该intent包含数据URI
+                //这个URI是数据定位符,指向用户所选的联系人
+                Uri contactUri = data.getData();
+                //Android提供了一个深度定制的API用户处理联系人信息:ContentProvider类
+                //ContentProvider的实例封装了联系人数据库并提供给其他应用使用
+                //可以通过ContentResolver访问ContentProvider
+                //指定想查询的数据中的字段
+                String[] queryFields = new String[]{ContactsContract.Contacts.DISPLAY_NAME};
+                //执行查询
+                Cursor cursor = getContext().getContentResolver()
+                        .query(contactUri, queryFields, null, null, null);
+                try {
+                    if (cursor.getCount() == 0) return;
+                    cursor.moveToFirst();
+                    String suspect = cursor.getString(0);
+                    mCrime.setSuspect(suspect);
+                    mSuspectButton.setText(suspect);
+                } finally {
+                    cursor.close();
+                }
+                break;
         }
     }
 
     private void updateDate() {
         mDateButton.setText(mCrime.getDate().toString());
     }
+
+    private String getCrimeReport() {
+        String solvedString = null;
+        if (mCrime.isSolved()) {
+            solvedString = getString(R.string.crime_report_solved);
+        } else {
+            solvedString = getString(R.string.crime_report_unsolved);
+        }
+
+        String dateFormat = "EEE, MMM dd";
+        //使用Android 提供的DateFormat 格式化工具类
+        String dateString = (String) DateFormat.format(dateFormat, mCrime.getDate());
+
+        String suspect = mCrime.getSuspect();
+        if (TextUtils.isEmpty(suspect)) {
+            suspect = getString(R.string.crime_report_no_suspect);
+        } else {
+            suspect = getString(R.string.crime_report_suspect);
+        }
+
+        String report = getString(R.string.crime_report, mCrime.getTitle(), dateString, solvedString, suspect);
+        return report;
+    }
+
+    /**
+     * 隐式Intent的主要组成部分
+     * 1:action 要执行的操作,通常以Intent类中的常量来表示.
+     *        要访问某个URL:Intent.ACTION_VIEW
+     * 2:data 待访问数据的位置(网页URL,文件URI,ContentProviderURI)
+     * 3:type 操作设计的数据类型 MIME形式的数据类型(text/html或者audio/mpeg3)
+     *        如果一个intent包含数据位置,可以推测出数据的类型
+     * 4:category:可选类别,用来描述打算何时,何地或者如何使用某个activity.
+     *        android.intent.category.INFO表明activity向用户显示了包信息,但是它不应该出现在启动器中
+     *
+     * 操作系统在寻找适用的activity时,不会使用附加在隐式intent上的任何extra
+     * 显示intent可以使用隐式intent的操作和数据部分,相当于要求特定activity去做特定的事.
+     */
 }

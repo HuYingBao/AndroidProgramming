@@ -18,7 +18,20 @@
         </activity>
         <activity
             android:name=".CrimePagerActivity"
-            android:parentActivityName=".CrimeListActivity"></activity>
+            android:parentActivityName=".CrimeListActivity" />
+        <!--<activity android:name=".CrimePagerActivity">-->
+        <!--<intent-filter>-->
+        <!--&lt;!&ndash;action元素告诉操作系统,activity能够胜任指定任务&ndash;&gt;-->
+        <!--<action android:name="android.intent.action.VIEW" />-->
+        <!--&lt;!&ndash;必须在intent过滤器中明确设置DEFAULT类别&ndash;&gt;-->
+        <!--&lt;!&ndash;DEFAULT类别告诉操作系统,用户问谁可以做时,activity原理处理某项任务&ndash;&gt;-->
+        <!--&lt;!&ndash;DEFAULT类别隐含于所有隐式intent中&ndash;&gt;-->
+        <!--<category android:name="android.intent.category.DEFAULT" />-->
+        <!--<data-->
+        <!--android:host="www.baidu.com"-->
+        <!--android:scheme="http" />-->
+        <!--</intent-filter>-->
+        <!--</activity>-->
     </application>
 
 </manifest>
