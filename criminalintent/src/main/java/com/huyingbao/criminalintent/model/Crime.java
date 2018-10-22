@@ -13,7 +13,11 @@ public class Crime {
     private boolean mSolved;//是否解决
 
     public Crime() {
-        mId = UUID.randomUUID();
+        this(UUID.randomUUID());
+    }
+
+    public Crime(UUID id) {
+        mId = id;
         mDate = new Date();
     }
 

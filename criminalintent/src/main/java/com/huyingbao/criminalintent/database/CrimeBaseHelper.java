@@ -3,7 +3,6 @@ package com.huyingbao.criminalintent.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.annotation.Nullable;
 
 /**
  * 1:确认目标数据库是否存在
@@ -21,6 +20,7 @@ public class CrimeBaseHelper extends SQLiteOpenHelper {
 
     /**
      * 负责创建,初始化数据库
+     * SQLite的字段不需要指定数据类型
      *
      * @param db
      */
@@ -33,7 +33,6 @@ public class CrimeBaseHelper extends SQLiteOpenHelper {
                 CrimeDbSchema.CrimeTable.Cols.DATE + ", " +
                 CrimeDbSchema.CrimeTable.Cols.SOLVED + ")"
         );
-
     }
 
     /**
