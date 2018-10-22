@@ -19,6 +19,20 @@
         <activity
             android:name=".CrimePagerActivity"
             android:parentActivityName=".CrimeListActivity" />
+
+        <!--这里的权限是指一个位置:文件保存地 -->
+        <!--把FileProvider和你指定的位置关联起来,就相当于你给发出请求的其他应用一个目标地-->
+        <!--添加exported="false"意味着除了你自己以及给与授权的人,其他任何人都不允许使用你的FileProvider-->
+        <!--grantUriPermissions属性用来给其他应用授权,允许它们向你指定的URI写入文件-->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.huyingbao.criminalintent.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/files" />
+        </provider>
         <!--<activity android:name=".CrimePagerActivity">-->
         <!--<intent-filter>-->
         <!--&lt;!&ndash;action元素告诉操作系统,activity能够胜任指定任务&ndash;&gt;-->

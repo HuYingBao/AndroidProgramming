@@ -19,10 +19,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.huyingbao.criminalintent.model.Crime;
 import com.huyingbao.criminalintent.model.CrimeLab;
 
+import java.io.File;
 import java.util.Date;
 import java.util.UUID;
 
@@ -36,12 +39,17 @@ public class CrimeFragment extends Fragment {
     private static final String DIALOG_DATE = "dialog_date";
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_CONTACT = 1;
+
     private EditText mTitleField;
     private Button mDateButton;
     private Button mReportButton;
     private Button mSuspectButton;
+    private ImageButton mPhotoButton;
+    private ImageView mPhotoView;
     private CheckBox mSolvedCheckBox;
+
     private Crime mCrime;
+    private File mPhotoFile;
 
     /**
      * 使用Arguments保存初始数据更直观有利于维护
@@ -62,6 +70,7 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getContext()).getCrime(crimeId);
+        mPhotoFile = CrimeLab.get(getContext()).getPhotoFile(mCrime);
     }
 
     /**
@@ -149,6 +158,9 @@ public class CrimeFragment extends Fragment {
         //使用电话URI创建一个隐士intent:Uri number = Uri.parse("tel:5551234");
         //Intent.ACTION_DIAL拨号,等用户发起通话
         //Intent.ACTION_CALL直接调出手机应用并拨打来自intent的电话号码
+
+        mPhotoButton = view.findViewById(R.id.crime_camera);
+        mPhotoView = view.findViewById(R.id.crime_photo);
         return view;
     }
 
@@ -239,5 +251,32 @@ public class CrimeFragment extends Fragment {
      *
      * 操作系统在寻找适用的activity时,不会使用附加在隐式intent上的任何extra
      * 显示intent可以使用隐式intent的操作和数据部分,相当于要求特定activity去做特定的事.
+     */
+
+    /**
+     * Context类提供的基本文件和目录处理方法
+     * 如果存储的文件仅供应用内部使用
+     *
+     * 1:File getFilesDir()
+     * 获取/data/data/<包名>/files 目录
+     * 2:File getCacheDir()
+     * 获取/data/data/<包名>/cache 目录
+     * 3:File getDir(String name,int mode)
+     * 获取/data/data/<包名>/目录的 子目录,如果不存在就先创建它
+     *
+     *
+     * 1:FileInputStream openFileInput(String name)
+     * 打开现有文件进行读取
+     * 2:FileOutputStream openFileOutput(String name,int mode)
+     * 打开文件进行写入,如果不存在就创建它
+     *
+     * String[] fileList()
+     * 获取主文件目录下的文件列表,可与其他方法配合使用,如openFileInput(String)
+     *
+     *
+     *
+     * 如果想共享文件给其他应用或是接收其他应用的文件,可以通过ContentProvider把要共享的文件暴露出来
+     * ContentProvider允许暴露内容URI给其他应用
+     * 这样这些应用就可以从内容URI下载或者向其中写入文件.
      */
 }

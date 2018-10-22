@@ -57,4 +57,13 @@ public class Crime {
     public void setSuspect(String suspect) {
         mSuspect = suspect;
     }
+
+    /**
+     * 文件名获取方法
+     *
+     * @return
+     */
+    public String getPhotoFileName() {
+        return "IMG_" + getId().toString() + ".jpg";
+    }
 }

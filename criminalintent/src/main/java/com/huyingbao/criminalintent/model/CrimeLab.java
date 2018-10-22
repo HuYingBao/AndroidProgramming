@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.huyingbao.criminalintent.database.CrimeBaseHelper;
 import com.huyingbao.criminalintent.database.CrimeDbSchema;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -79,6 +80,18 @@ public class CrimeLab {
             //return之后 finally 代码块也会被执行
             cursorWrapper.close();
         }
+    }
+
+    /**
+     * 定位照片文件
+     * 该方法不会创建任何文件,作用就是返回指向某个具体位置的File对象
+     *
+     * @param crime
+     * @return
+     */
+    public File getPhotoFile(Crime crime) {
+        File filesDir = mContext.getFilesDir();
+        return new File(filesDir, crime.getPhotoFileName());
     }
 
     /**
