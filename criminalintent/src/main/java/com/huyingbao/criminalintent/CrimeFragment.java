@@ -2,6 +2,7 @@ package com.huyingbao.criminalintent;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -127,6 +128,8 @@ public class CrimeFragment extends Fragment {
         });
         //启动一个隐式Intent来选择联系人
         final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        //过滤器验证代码
+        //pickContact.addCategory(Intent.CATEGORY_HOME);
         mSuspectButton = view.findViewById(R.id.crime_suspect);
         mSuspectButton.setOnClickListener(v -> {
             startActivityForResult(pickContact, REQUEST_CONTACT);
@@ -134,6 +137,18 @@ public class CrimeFragment extends Fragment {
         if (mCrime.getSuspect() != null) {
             mSuspectButton.setText(mCrime.getSuspect());
         }
+        //检查是否存在联系人应用
+        //Android设备上安装了哪些组件以及包括哪些activity,PackageManager类全都知道
+        PackageManager packageManager = getActivity().getPackageManager();
+        //flag标志MATCH_DEFAULT_ONLY限定只搜索带CATEGORY_DEFAULT标志的activity
+        if (packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
+            mSuspectButton.setEnabled(false);
+        }
+        //使用android.permission.READ_CONTACTS权限.可以查询到ContactsContract.Contacts._ID
+        //然后使用联系人ID查询CommonDataKinds.Phone表
+        //使用电话URI创建一个隐士intent:Uri number = Uri.parse("tel:5551234");
+        //Intent.ACTION_DIAL拨号,等用户发起通话
+        //Intent.ACTION_CALL直接调出手机应用并拨打来自intent的电话号码
         return view;
     }
 
