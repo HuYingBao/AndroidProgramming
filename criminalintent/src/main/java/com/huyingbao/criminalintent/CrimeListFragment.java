@@ -1,7 +1,7 @@
 package com.huyingbao.criminalintent;
 
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,7 +33,13 @@ public class CrimeListFragment extends Fragment {
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mCrimeAdapter;
     private boolean mSubtitleVisible;
+    private Callbacks mCallbacks;
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = context instanceof Callbacks ? (Callbacks) context : null;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,6 +80,12 @@ public class CrimeListFragment extends Fragment {
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         //菜单布局文件名同界面布局文件名
@@ -92,8 +104,9 @@ public class CrimeListFragment extends Fragment {
             case R.id.new_crime:
                 Crime crime = new Crime();
                 CrimeLab.get(getContext()).addCrime(crime);
-                Intent intent = CrimePagerActivity.newIntent(getContext(), crime.getId());
-                startActivity(intent);
+                //更新页面,启用回调
+                updateUI();
+                mCallbacks.onCrimeSelected(crime);
                 //完成菜单项事件处理,返回true表明任务已经完成
                 return true;
             case R.id.show_subtitle:
@@ -118,7 +131,10 @@ public class CrimeListFragment extends Fragment {
         activity.getSupportActionBar().setSubtitle(subtitle);
     }
 
-    private void updateUI() {
+    /**
+     * 可供托管activity调用吧
+     */
+    public void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getContext());
         List<Crime> crimes = crimeLab.getCrimes();
         if (mCrimeAdapter == null) {
@@ -164,8 +180,7 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Intent intent = CrimePagerActivity.newIntent(getContext(), mCrime.getId());
-            startActivity(intent);
+            mCallbacks.onCrimeSelected(mCrime);
         }
     }
 
@@ -226,5 +241,12 @@ public class CrimeListFragment extends Fragment {
             Crime crime = mCrimes.get(i);
             crimeHolder.bind(crime);
         }
+    }
+
+    /**
+     * 添加回调接口,托管activity需要实现该接口
+     */
+    public interface Callbacks {
+        void onCrimeSelected(Crime crime);
     }
 }

@@ -1,6 +1,7 @@
 package com.huyingbao.criminalintent;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -56,6 +57,7 @@ public class CrimeFragment extends Fragment {
 
     private Crime mCrime;
     private File mPhotoFile;
+    private Callbacks mCallbacks;
 
     /**
      * 使用Arguments保存初始数据更直观有利于维护
@@ -69,6 +71,12 @@ public class CrimeFragment extends Fragment {
         CrimeFragment fragment = new CrimeFragment();
         fragment.setArguments(bundle);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = context instanceof Callbacks ? (Callbacks) context : null;
     }
 
     @Override
@@ -103,6 +111,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mCrime.setTitle(s.toString());
+                updateCrime();
             }
 
             @Override
@@ -128,6 +137,7 @@ public class CrimeFragment extends Fragment {
         mSolvedCheckBox.setChecked(mCrime.isSolved());
         mSolvedCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             mCrime.setSolved(isChecked);
+            updateCrime();
         });
 
         //启动一个隐式Intent 发送消息
@@ -218,6 +228,7 @@ public class CrimeFragment extends Fragment {
             case REQUEST_DATE:
                 Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
                 mCrime.setDate(date);
+                updateCrime();
                 updateDate();
                 break;
             case REQUEST_CONTACT:
@@ -243,6 +254,7 @@ public class CrimeFragment extends Fragment {
                     cursor.moveToFirst();
                     String suspect = cursor.getString(0);
                     mCrime.setSuspect(suspect);
+                    updateCrime();
                     mSuspectButton.setText(suspect);
                 } finally {
                     cursor.close();
@@ -255,9 +267,23 @@ public class CrimeFragment extends Fragment {
                         "com.huyingbao.criminalintent.fileprovider",
                         mPhotoFile);
                 getContext().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                updateCrime();
                 updatePhotoView();
                 break;
         }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
+
+    private void updateCrime() {
+        //在数据库中保存更改
+        CrimeLab.get(getContext()).updateCrime(mCrime);
+        //调用回调更新数据
+        if (mCallbacks != null) mCallbacks.onCrimeUpdated(mCrime);
     }
 
     private void updateDate() {
@@ -294,6 +320,10 @@ public class CrimeFragment extends Fragment {
             Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
             mPhotoView.setImageBitmap(bitmap);
         }
+    }
+
+    public interface Callbacks {
+        void onCrimeUpdated(Crime crime);
     }
 
     /**
