@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.huyingbao.criminalintent">
 
+    <!--假如应用要用到诸如相机,NFC或者任何其他的随设备走的功能时,都应该要让Android系统知道.-->
+    <!--假如设备缺少这样的功能,类似Google Play商店的安装程序就会拒绝安装应用-->
+    <!--required="true"的情况下,无拍照功能的手机无法安装该应用-->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

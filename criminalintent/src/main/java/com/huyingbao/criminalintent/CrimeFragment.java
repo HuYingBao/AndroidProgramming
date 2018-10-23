@@ -3,12 +3,16 @@ package com.huyingbao.criminalintent;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -27,6 +31,7 @@ import com.huyingbao.criminalintent.model.CrimeLab;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -39,6 +44,7 @@ public class CrimeFragment extends Fragment {
     private static final String DIALOG_DATE = "dialog_date";
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_CONTACT = 1;
+    private static final int REQUEST_PHOTO = 2;
 
     private EditText mTitleField;
     private Button mDateButton;
@@ -70,6 +76,7 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getContext()).getCrime(crimeId);
+        //获取照片文件位置
         mPhotoFile = CrimeLab.get(getContext()).getPhotoFile(mCrime);
     }
 
@@ -159,8 +166,40 @@ public class CrimeFragment extends Fragment {
         //Intent.ACTION_DIAL拨号,等用户发起通话
         //Intent.ACTION_CALL直接调出手机应用并拨打来自intent的电话号码
 
+        //使用相机intent
         mPhotoButton = view.findViewById(R.id.crime_camera);
+        final Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        //判断是否有能够处理Intent Action的activity
+        boolean canTakePhoto = mPhotoFile != null
+                && captureIntent.resolveActivity(packageManager) != null;
+        mPhotoButton.setEnabled(canTakePhoto);
+        mPhotoButton.setOnClickListener(v -> {
+            //把本地文件路径转换为相机能看见的URI形式
+            Uri uri = FileProvider.getUriForFile(getContext(),
+                    "com.huyingbao.criminalintent.fileprovider",
+                    mPhotoFile);
+            captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+            //查询系统中的所有相机应用
+            List<ResolveInfo> cameraActivities = packageManager.queryIntentActivities(
+                    captureIntent, packageManager.MATCH_DEFAULT_ONLY);
+            //要实际写入文件,还需要给相机应用授权
+            //我们授权FLAG_GRANT_WRITE_URI_PERMISSION给所有cameraIntent 的目标activity
+            //以此允许它们在Uri指定的位置写文件
+            for (ResolveInfo resolveInfo : cameraActivities) {
+                getContext().grantUriPermission(
+                        resolveInfo.activityInfo.packageName,
+                        uri,
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            }
+            startActivityForResult(captureIntent, REQUEST_PHOTO);
+
+        });
+        //更新图片显示view
         mPhotoView = view.findViewById(R.id.crime_photo);
+        updatePhotoView();
+        //ViewTreeObserver对象设置包括OnGlobalLayoutListener在内的各种监听器
+        //使用OnGlobalLayoutListener监听器,可以监听任何布局的传递,控制事件的发生
+        //ViewTreeObserver observer= mPhotoView.getViewTreeObserver();
         return view;
     }
 
@@ -209,6 +248,15 @@ public class CrimeFragment extends Fragment {
                     cursor.close();
                 }
                 break;
+            case REQUEST_PHOTO:
+                //既然相机已经保存了文件,就在再次调用权限,关闭文件访问
+                Uri uri = FileProvider.getUriForFile(
+                        getContext(),
+                        "com.huyingbao.criminalintent.fileprovider",
+                        mPhotoFile);
+                getContext().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                updatePhotoView();
+                break;
         }
     }
 
@@ -237,6 +285,15 @@ public class CrimeFragment extends Fragment {
 
         String report = getString(R.string.crime_report, mCrime.getTitle(), dateString, solvedString, suspect);
         return report;
+    }
+
+    private void updatePhotoView() {
+        if (mPhotoFile == null || !mPhotoFile.exists()) {
+            mPhotoView.setImageDrawable(null);
+        } else {
+            Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+            mPhotoView.setImageBitmap(bitmap);
+        }
     }
 
     /**
