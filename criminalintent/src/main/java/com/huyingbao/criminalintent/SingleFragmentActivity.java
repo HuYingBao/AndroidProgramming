@@ -1,6 +1,7 @@
 package com.huyingbao.criminalintent;
 
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +13,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fragment);
+        setContentView(getLayoutResId());
         //1:管理fragment队列
         //2:管理fragment事务回退栈
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -28,5 +29,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
                     .add(R.id.fragment_container, fragment)
                     .commit();
         }
+    }
+
+    @LayoutRes
+    protected int getLayoutResId() {
+        return R.layout.activity_fragment;
     }
 }

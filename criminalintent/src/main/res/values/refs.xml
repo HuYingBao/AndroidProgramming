@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--创建默认的别名资源值-->
+    <!--type决定资源ID属于什么内部类-->
+    <!--即使别名资源自身在res/values/目录中,它的资源ID依然属于R.layout内部类-->
+    <!--对于小于指定尺寸的设备-->
+    <item name="activity_master_detail" type="layout">@layout/activity_fragment</item>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--对于大于指定尺寸的设备-->
+    <!--配置修饰符-sw600dp的作用是:-->
+    <!--如果设备尺寸大于某个指定值,就使用对应的资源文件-->
+    <!--sw是smallest width的缩写,与设备的当前方向无关-->
+    <item name="activity_master_detail" type="layout">@layout/activity_twopane</item>
+</resources>
