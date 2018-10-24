@@ -188,6 +188,8 @@ public class CrimeListFragment extends Fragment {
      * Adapter是一个控制器对象,从模型层获取数据,然后提供给RecyclerView显示,是沟通的桥梁
      * 1:创建必要的ViewHolder
      * 2:绑定ViewHolder至模型层数据
+     * <p>
+     * ItemTouchHelper类提供触摸手势等操作
      */
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
         private List<Crime> mCrimes;

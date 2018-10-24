@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--设备设置-->
+    <!--1:语言设置:values-zh r代表区域,语言代码小写,r+区域字母大写  -->
+    <!--2:屏幕方向:layout-land-->
+    <!--3:屏幕尺寸:layout-sw600dp-->
+    <!--4:屏幕显示密度:drawable-mdpi-->
+    <!--使用不同的配置修饰符,没有配置修饰符的资源就是Android的默认资源-->
+    <!--如果无法找到当前配置的资源,会使用默认资源-->
+    <!--Android默认资源使用规则不适用于屏幕显示密度-->
+    <!--drawable目录的使用取决于对屏幕尺寸和显示密度的综合考虑-->
+    <string name="app_name">CriminalIntent</string>
+    <string name="crime_title_hint">crime 简短描述</string>
+    <string name="crime_title_label">标题</string>
+    <string name="crime_details_label">明细</string>
+    <string name="crime_solved_label">是否解决</string>
+    <string name="crime_suspect_text">嫌疑人联系方式</string>
+    <string name="crime_report_text">抗议或投诉</string>
+
+    <string name="crime_report">%1$s!crime 发生 于 %2$s. %3$s, %4$s</string>
+    <string name="crime_report_solved">问题已解决</string>
+    <string name="crime_report_unsolved">问题未解决</string>
+    <string name="crime_report_no_suspect">没找到嫌疑人</string>
+    <string name="crime_report_suspect">嫌疑人是 %s</string>
+    <string name="crime_report_subject">crime处理情况报告</string>
+    <string name="send_report">投诉方式</string>
+
+    <string name="date_picker_title">crime发生日期</string>
+
+    <string name="new_crime">新增记录</string>
+    <string name="show_subtitle">显示子标题</string>
+    <string name="hide_subtitle">隐藏子标题</string>
+    <!--复数字符串资源-->
+    <plurals name="subtitle_plurals">
+        <item quantity="one">%1$d crime</item>
+        <item quantity="other">%1$d crimes</item>
+    </plurals>
+</resources>

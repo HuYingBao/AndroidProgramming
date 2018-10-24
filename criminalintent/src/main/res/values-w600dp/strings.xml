@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- -w600dp会匹配屏幕宽度大于600dp的任何设备,如果设备水平模式的屏幕符合条件也可以-->
+    <!--语言优先级高于屏幕方位-->
+    <string name="crime_title_hint">Enter a meaningful, memorable title for the crime.</string>
+</resources>
