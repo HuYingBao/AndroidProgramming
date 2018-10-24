@@ -35,4 +35,7 @@
         <item quantity="one">%1$d crime</item>
         <item quantity="other">%1$d crimes</item>
     </plurals>
+    <string name="crime_photo_button_description">拍摄陋习现场</string>
+    <string name="crime_photo_no_image_description">陋习现场照片(未设置)</string>
+    <string name="crime_photo_image_description">陋习现场照片(设置)</string>
 </resources>

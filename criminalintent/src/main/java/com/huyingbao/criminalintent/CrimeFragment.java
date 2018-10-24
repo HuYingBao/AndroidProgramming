@@ -313,12 +313,18 @@ public class CrimeFragment extends Fragment {
         return report;
     }
 
+    /**
+     * 1:动态更新图片
+     * 2:动态设置内容描述
+     */
     private void updatePhotoView() {
         if (mPhotoFile == null || !mPhotoFile.exists()) {
-            mPhotoView.setImageDrawable(null);
+            mPhotoView.setImageResource(R.color.colorPrimary);
+            mPhotoView.setContentDescription(getString(R.string.crime_photo_no_image_description));
         } else {
             Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
             mPhotoView.setImageBitmap(bitmap);
+            mPhotoView.setContentDescription(getString(R.string.crime_photo_image_description));
         }
     }
 
