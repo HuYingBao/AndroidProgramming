@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/recycler_view"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".BeatBoxActivity">
-
-</android.support.v7.widget.RecyclerView>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!--使用数据绑定布局-->
+    <!--layout告诉数据绑定工具:这个布局由你来处理-->
+    <!--接到任务,数据绑定工具会帮你生成一个绑定类,新产生的绑定类默认以布局文件命名-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".BeatBoxActivity" />
+</layout>
