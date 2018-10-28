@@ -4,9 +4,13 @@
     <!--使用数据绑定布局-->
     <!--layout告诉数据绑定工具:这个布局由你来处理-->
     <!--接到任务,数据绑定工具会帮你生成一个绑定类,新产生的绑定类默认以布局文件命名-->
+    <!--FragmentBeatBoxBinding类用来做数据绑定的类:现在,实例化视图层级结构,不再使用LayoutInflater-->
+    <!--而是实例化FragmentBeatBoxBinding类,在一个叫做getRoot()的getter方法里,-->
+    <!--FragmentBeatBoxBinding引用着布局视图结构-->
+    <!--而且也会引用那些在布局文件里以android:id标签引用的其他视图-->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".BeatBoxActivity" />
+        tools:context=".BeatBoxFragment" />
 </layout>
