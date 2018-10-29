@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <!--声明视图模型属性-->
+        <!--在这个绑定类上定义了一个叫做viewModel的属性,同事还包括getter和setter方法-->
+        <variable
+            name="viewModel"
+            type="com.huyingbao.beatbox.SoundViewModel" />
+    </data>
+
+    <!--在绑定类里,可以用绑定表达式使用viewModel-->
+    <!--在绑定表达式里,可以写一些简单的java表达式,如链式方法调用,数学计算等-->
+    <!--可以使用语法糖,如viewModel.title实际就是viewModel.getTitle()的简写形式-->
+    <!--数据绑定知道怎么翻译-->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:text="@{viewModel.title}"
+        tools:text="Sound name" />
+</layout>
