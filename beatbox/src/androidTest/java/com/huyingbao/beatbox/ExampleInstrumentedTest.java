@@ -10,6 +10,9 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
 /**
+ * 都是整合测试类：
+ * 1：可以运行在设备上，运行时动态测试应用行为
+ * 2：需要变异打包为apk，浪费资源
  * Instrumented test, which will execute on an Android device.
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>

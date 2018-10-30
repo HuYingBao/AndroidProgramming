@@ -32,6 +32,19 @@ import java.util.List;
  * 从前控制器对象格式化视图数据的工作转给了视图模型对象.
  * 控制器对象(activity或fragment)开始负责初始化布局绑定类和视图模型对象,也是它们的纽带.
  * <p>
+ * 可以销毁和重建fragment的视图，但fragment自身可以不被销毁
+ * 设备配置发生改变时，FragmentManager首先销毁队列中fragment的视图，
+ * 理由：新的配置可能需要新的资源来匹配；当有更合适的资源可用时，则应重建视图。
+ * <p>
+ * fragment进入保留状态的条件
+ * 1:已调用fragment的setRetainInstance(true)方法
+ * 2:因设备配置改变(通常为设备旋转)，托管activity正在被销毁
+ * <p>
+ * fragment只能保留非常短的时间，即从fragment脱离旧activity到重新附加给快速新建的activity之间的时间
+ * <p>
+ * 除非不得已，不要使用保留fragment
+ * 1:已保留fragment用起来更复杂，出问题，排查耗时
+ * 2:保留的fragment只能应付activity因设备旋转而被销毁的情况，不能适应因系统回收销毁activity的情况
  * Created by liujunfeng on 2018/10/24.
  */
 public class BeatBoxFragment extends Fragment {
@@ -44,6 +57,10 @@ public class BeatBoxFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //该方法可保留fragment，已保留的fragment不会随activity一起被销毁
+        //它会一直保留，并在需要时原封不动转给新的activity
+        //对于已保留的fragment实例，其全部实例变量的值也会保持不变
+        setRetainInstance(true);
         mBeatBox = new BeatBox(getContext());
     }
 
@@ -59,6 +76,12 @@ public class BeatBoxFragment extends Fragment {
         beatBoxBinding.recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         beatBoxBinding.recyclerView.setAdapter(new SoundAdapter(mBeatBox.getSounds()));
         return beatBoxBinding.getRoot();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBeatBox.release();
     }
 
     private class SoundHolder extends RecyclerView.ViewHolder {

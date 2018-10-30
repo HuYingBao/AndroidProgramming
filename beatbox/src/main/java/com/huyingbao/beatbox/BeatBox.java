@@ -32,6 +32,13 @@ public class BeatBox {
     private List<Sound> mSounds = new ArrayList<>();
     private SoundPool mSoundPool;
 
+    /**
+     * Sound类中的一切可以保存，SoundPool无法保存
+     * 不可保存性有向外传递的倾向、
+     * 如果一个对象重度依赖另一个不可保存的对象，
+     * 那么这个对象很可能也无法保存
+     * @param context
+     */
     public BeatBox(Context context) {
         //所有Context中的AssetManager都管理着同一套assets资源
         mAssetManager = context.getAssets();
@@ -88,7 +95,11 @@ public class BeatBox {
         Integer soundId = sound.getSoundId();
         if (soundId == null) return;
         //音频ID、左音量、右音量、优先级、是否循环、播放速率
-        mSoundPool.play(soundId, 0.1f, 0.1f, 1, 0, 1.0f);
+        mSoundPool.play(soundId, 0.4f, 0.4f, 1, 0, 1.0f);
+    }
+
+    public void release() {
+        mSoundPool.release();
     }
 
     public List<Sound> getSounds() {
