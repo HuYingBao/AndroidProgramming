@@ -1,5 +1,7 @@
 package com.huyingbao.beatbox;
 
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -62,6 +64,13 @@ public class BeatBoxFragment extends Fragment {
         //对于已保留的fragment实例，其全部实例变量的值也会保持不变
         setRetainInstance(true);
         mBeatBox = new BeatBox(getContext());
+
+        //获取主题属性
+        Resources.Theme theme = getActivity().getTheme();
+        int[] attrsToFetch = {R.attr.colorAccent};
+        TypedArray a = theme.obtainStyledAttributes(R.style.AppTheme, attrsToFetch);
+        int accentColor = a.getInt(0, 0);
+        a.recycle();
     }
 
     @Nullable

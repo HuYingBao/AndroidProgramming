@@ -1,17 +1,32 @@
 <resources>
 
-    <!-- Base application theme. -->
+    <!--AppCompat库可以看作应用的一部分。编译项目时，工具会引入AppCompat库和它的java和xml文件。-->
+    <!--这些文件已包含在应用里，如同自己编写的文件，如果想引用AppCompat库里的资源，直接应用就可以-->
+    <!--有些主题包含在Android操作系统里，如Theme，引用时必须加上指向归属地的命名空间-->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <!--该属性主要应用于工具栏，应用品牌色-->
+        <item name="colorPrimary">@color/red</item>
+        <!--只有Lollipop 5.0以后的系统支持状态栏颜色-->
+        <item name="colorPrimaryDark">@color/dark_red</item>
+        <!--该主题色应该和colorPrimary形成反差效果，主要用来给EditText这样的组件着色-->
+        <!--按钮组件不支持橘色-->
+        <item name="colorAccent">@color/gray</item>
+        <item name="buttonStyle">@style/BeatBoxButton.Strong</item>
+        <!--windowBackground这个属性来自Android操作系统，需要使用android命名空间-->
+        <item name="android:windowBackground">@color/soothing_blue</item>
     </style>
 
-    <style name="BeatBoxButton">
+    <!--继承Widget.AppCompat.Button样式，就是首先让所有按钮都继承常规按钮的属性-->
+    <!--然后根据需要，有选择地修改一些属性-->
+    <!--如果不指定BeatBoxButton样式的父样式，所有按钮会变得不再像个按钮-->
+    <style name="BeatBoxButton" parent="Widget.AppCompat.Button">
         <item name="android:background">@color/dark_blue</item>
     </style>
 
+    <!--要以主题名的形式指定父主题，有继承关系的两个主题都应处于同一个包中-->
+    <!--一旦AppCompat库要跨库继承，就一定要明确使用parent属性-->
+    <!--如果是继承自己内部的属性，使用主题名指定父主题即可-->
+    <!--如果是继承Android操作系统中的样式或主题，使用parent属性-->
     <!--<style name="StrongBeatBoxButton" parent="@style/BeatBoxButton"/>-->
     <style name="BeatBoxButton.Strong">
         <item name="android:textStyle">bold</item>
