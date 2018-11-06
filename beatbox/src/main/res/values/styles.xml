@@ -20,7 +20,7 @@
     <!--然后根据需要，有选择地修改一些属性-->
     <!--如果不指定BeatBoxButton样式的父样式，所有按钮会变得不再像个按钮-->
     <style name="BeatBoxButton" parent="Widget.AppCompat.Button">
-        <item name="android:background">@color/dark_blue</item>
+        <item name="android:background">@drawable/button_beat_box</item>
     </style>
 
     <!--要以主题名的形式指定父主题，有继承关系的两个主题都应处于同一个包中-->
