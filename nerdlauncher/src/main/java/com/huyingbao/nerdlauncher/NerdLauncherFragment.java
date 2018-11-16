@@ -2,6 +2,7 @@ package com.huyingbao.nerdlauncher;
 
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
@@ -66,7 +67,7 @@ public class NerdLauncherFragment extends Fragment {
         mRecyclerView.setAdapter(new ActivityAdapter(resolveInfoList));
     }
 
-    private class ActivityHolder extends RecyclerView.ViewHolder {
+    private class ActivityHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ResolveInfo mResolveInfo;
         private TextView mNameTextView;
 
@@ -80,6 +81,23 @@ public class NerdLauncherFragment extends Fragment {
             PackageManager packageManager = getContext().getPackageManager();
             String appName = mResolveInfo.loadLabel(packageManager).toString();
             mNameTextView.setText(appName);
+            mNameTextView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            //发送的intent是否包含操作，对于大多数应用来说没有什么差别。
+            //不过，有些应用的启动行为可能有所不同。
+            //取决于不同的启动要求，同样的activity可能会显示不同的用户界面
+            //最好能明确启动意图，以方便activity完成它应该完成的任务。
+            ActivityInfo activityInfo = mResolveInfo.activityInfo;
+            //使用不同的intent初始化方法
+            //使用setClassName(...)方法能够自动创建组件名
+            Intent i = new Intent(Intent.ACTION_MAIN)
+                    .setClassName(activityInfo.applicationInfo.packageName, activityInfo.name)
+                    //启动新activity时启动新任务task
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         }
     }
 
