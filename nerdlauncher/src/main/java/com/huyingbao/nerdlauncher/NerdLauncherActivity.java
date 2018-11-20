@@ -20,13 +20,24 @@ import android.support.v4.app.Fragment;
  * 应用伴随着自己的进程一起完成创建，该进程也是应用中所有组件的默认进程。
  * <p>
  * 虽然组件可以指派给不同的进程，但推荐使用默认进程。相比多进程的使用，多线程的使用更加方便。
- *
+ * <p>
  * 每一个activity实例都仅存在与一个进程process中，同一个任务task关联.
  * 任务task只包含activity，这些activity通常来自不同的应用进程；
  * 而进程包含了应用的全部运行代码和对象。
- *
+ * <p>
  * 从NerdLauncher启动器中启动CriminalIntent应用时，操作系统创建了一个CriminalIntent进程process
  * 以及一个以CrimeListActivity为基栈activity的新任务task
+ *
+ * 在Lollipop系统及以上版本中，对以android.intent.action.SEND或
+ * action.intent.action.SEND_MULTIPLE启动的activity，
+ * 隐式intent选择器会创建独立的新任务。
+ * 在Lollipop中叫做并发文档（concurrent document）.
+ * 有了并发文档，就可以为运行的应用动态创建任意数目的任务task。
+ *
+ * 在Lollipop设备上，如果需要应用启动多个任务：
+ * 1：给intent打上Intent.FLAG_NEW_DOCUMENT标签flag；
+ * 2：manifest文件中，为activity设置如下documentLaunchMode:
+ * android:documentLaunchMode="intoExisting"
  */
 public class NerdLauncherActivity extends SingleFragmentActivity {
 
