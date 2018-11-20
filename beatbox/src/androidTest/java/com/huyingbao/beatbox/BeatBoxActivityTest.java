@@ -16,7 +16,7 @@ import static org.hamcrest.CoreMatchers.anything;
 /**
  * 注解表明，这是一个Android工具测试
  * 需要activity和其他Android运行时环境支持
- *
+ * <p>
  * 整合测试场景中，虚拟对象显然不能用来隔离应用，
  * 相反我们用它把应用和外部交互对象隔离开来，如提供web service假数据和假反馈
  * 做整合测试时，最好避免使用想Mockito这样的自动虚拟测试框架

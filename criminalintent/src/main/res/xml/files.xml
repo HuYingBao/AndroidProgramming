@@ -6,7 +6,7 @@
 <paths>
     <files-path
         name="crime_photos"
-        path="."/>
+        path="." />
     <!--<files-path name="name" path="path" />-->
     <!--物理路径相当于Context.getFilesDir() + /path/。-->
 

@@ -1,3 +1,4 @@
-//include ':geoquiz'
-//include ':criminalintent'
-include ':beatbox', ':nerdlauncher'
+include ':geoquiz', ':photogallery'
+include ':criminalintent'
+include ':beatbox'
+include ':nerdlauncher'

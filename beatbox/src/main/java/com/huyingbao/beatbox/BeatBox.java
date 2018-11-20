@@ -37,6 +37,7 @@ public class BeatBox {
      * 不可保存性有向外传递的倾向、
      * 如果一个对象重度依赖另一个不可保存的对象，
      * 那么这个对象很可能也无法保存
+     *
      * @param context
      */
     public BeatBox(Context context) {
