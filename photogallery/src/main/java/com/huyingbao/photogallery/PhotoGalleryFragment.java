@@ -1,6 +1,7 @@
 package com.huyingbao.photogallery;
 
 
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,7 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +49,7 @@ public class PhotoGalleryFragment extends Fragment {
         //在fragment的视图创建时就计算并设置好网格列数。但是这时RecyclerView还没有改变
         //可以实现ViewTreeObserver.OnGlobalLayoutListener监听器方法和计算列数的onGlobalLayout()方法
         //然后使用addOnGlobalLayoutListener()把监听器添加个RecyclerView视图。
-        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         setupAdapter();
         return view;
     }
@@ -124,15 +125,15 @@ public class PhotoGalleryFragment extends Fragment {
     }
 
     private class PhotoHolder extends RecyclerView.ViewHolder {
-        private TextView mTitleTextView;
+        private ImageView mImageView;
 
         public PhotoHolder(@NonNull View itemView) {
             super(itemView);
-            mTitleTextView = (TextView) itemView;
+            mImageView = itemView.findViewById(R.id.item_image_view);
         }
 
-        public void bindGalleryItem(GalleryItem item) {
-            mTitleTextView.setText(item.toString());
+        public void bindDrawabe(Drawable drawable) {
+            mImageView.setImageDrawable(drawable);
         }
     }
 
@@ -146,14 +147,16 @@ public class PhotoGalleryFragment extends Fragment {
         @NonNull
         @Override
         public PhotoHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-            TextView textView = new TextView(getActivity());
-            return new PhotoHolder(textView);
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            View view = inflater.inflate(R.layout.list_item_gallery, viewGroup, false);
+            return new PhotoHolder(view);
         }
 
         @Override
         public void onBindViewHolder(@NonNull PhotoHolder photoHolder, int i) {
             GalleryItem galleryItem = mGalleryItems.get(i);
-            photoHolder.bindGalleryItem(galleryItem);
+            Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher_background);
+            photoHolder.bindDrawabe(drawable);
         }
 
         @Override
