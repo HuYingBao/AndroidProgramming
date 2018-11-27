@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ public class PhotoGalleryFragment extends Fragment {
     private static final String TAG = "PhotoGalleryFragment";
     private RecyclerView mPhotoRecyclerView;
     private List<GalleryItem> mItems = new ArrayList<>();
+    private ThumbnailDownloader<PhotoHolder> mThumbnailDownloader;
 
 
     public static PhotoGalleryFragment newInstance() {
@@ -38,6 +40,12 @@ public class PhotoGalleryFragment extends Fragment {
         //调用execute()方法会启动AsyncTask
         //进而触发后台线程并调用doInBackground(...)方法
         new FetchItemsTask().execute();
+
+        mThumbnailDownloader = new ThumbnailDownloader<>();
+        mThumbnailDownloader.start();
+        //getLooper()方法必须在start()方法之后调用
+        mThumbnailDownloader.getLooper();
+        Log.i(TAG, "Background thread started");
     }
 
     @Override
@@ -52,6 +60,14 @@ public class PhotoGalleryFragment extends Fragment {
         mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         setupAdapter();
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //一定要终止HandlerThread否后会一直执行下去
+        mThumbnailDownloader.quit();
+        Log.i(TAG, "Background thread destroyed");
     }
 
     /**
@@ -103,6 +119,8 @@ public class PhotoGalleryFragment extends Fragment {
      * LoaderManager还负责启动和停止loader，以及管理loader的生命周期。
      * 设备配置改变后，如果初始化一个已经加载完数据的loader，它能立即提交数据，
      * 而不是再次尝试获取数据。无论fragment是否得到保留，它都会这样做。
+     * <p>
+     * AsyncTask是执行后台线程的最简单方式，但它不适用于重复且长时间运行的任务。
      */
     private class FetchItemsTask extends AsyncTask<Void, Void, List<GalleryItem>> {
 
@@ -157,6 +175,8 @@ public class PhotoGalleryFragment extends Fragment {
             GalleryItem galleryItem = mGalleryItems.get(i);
             Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher_background);
             photoHolder.bindDrawabe(drawable);
+            //下载url中图片到viewHolder中的view中
+            mThumbnailDownloader.queueThumnail(photoHolder, galleryItem.getUrl());
         }
 
         @Override
@@ -165,4 +185,46 @@ public class PhotoGalleryFragment extends Fragment {
         }
     }
 
+    /**
+     * Android系统中，线程使用的收件箱叫作消息队列(message queue)。
+     * 使用消息队列的线程叫作消息循环(message loop)。
+     * 消息循环会循环检查消息队列上是否有新消息。
+     * 消息循环由线程和looper组成。Looper对象管理着线程的消息队列。
+     *
+     * 主线程就是个消息循环，因此也拥有looper。
+     * 主线程的所有工作都是由其looper完成的。
+     * looper不断从消息队列中抓取消息，然后完成消息指定的任务。
+     *
+     * 消息是Message类的一个实例
+     * 1 what：用户定义的int型消息代码，用来描述消息
+     * 2 obj：用户指定，随消息发送的对象
+     * 3 target：处理消息的Handler。
+     *
+     * Message的目标(target)是一个Handler类实例。
+     * Handler可以看作message handler的简称。
+     * 创建Message时，它会自动与一个Handler相关联。
+     * Message待处理时，Handler对象负责触发消息处理事件。
+     *
+     * 要处理消息以及消息指定的任务，首先需要一个Handler实例。
+     * Handler不仅仅是处理Message的目标(target),也是创建和发布Message的接口。
+     *
+     * Looper拥有Message对象的收件箱，所以Message必须在Looper上发布或处理。
+     * 既然有这层关系，为协同工作，Handler总是引用着Looper.
+     *
+     * 一个Handler仅与一个Looper相关联，一个Message也仅与一个目标Handler相关联。
+     * Looper拥有整个Message队列。多个Message可以引用同一目标Handler。
+     * 多个Handler也可以与一个Looper相关联。
+     * 一个Handler的Message可能与另一个Handler的Message存放在同一消息队列中。
+     *
+     * 不应手动设置消息的目标Handler。创建消息时，最好调用Handler.obtainMessage(...)方法。
+     * 传入其他必要消息字段后，该方法会自动设置目标Handler。
+     *
+     * 为避免反复创建新的Message对象，Handler.obtainMessage(...)方法会从公共回收池里获取消息。
+     *
+     * 一旦取得Message，就可以调用sendToTarget()方法将其发送给它的Handler。
+     * 然后，Handler会将这个Message放置在Looper消息队列的尾部。
+     *
+     *
+     *
+     */
 }
