@@ -176,7 +176,7 @@ public class PhotoGalleryFragment extends Fragment {
             Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher_background);
             photoHolder.bindDrawabe(drawable);
             //下载url中图片到viewHolder中的view中
-            mThumbnailDownloader.queueThumnail(photoHolder, galleryItem.getUrl());
+            mThumbnailDownloader.queueThumbnail(photoHolder, galleryItem.getUrl());
         }
 
         @Override
