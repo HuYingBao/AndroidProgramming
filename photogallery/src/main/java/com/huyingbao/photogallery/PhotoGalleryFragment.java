@@ -1,9 +1,11 @@
 package com.huyingbao.photogallery;
 
 
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -41,7 +43,15 @@ public class PhotoGalleryFragment extends Fragment {
         //进而触发后台线程并调用doInBackground(...)方法
         new FetchItemsTask().execute();
 
-        mThumbnailDownloader = new ThumbnailDownloader<>();
+        //将主线程关联的Handler传递给ThumbnailDownloader
+        Handler responseHandler = new Handler();
+        mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
+        //设置监听器，监听并回调处理已下载图片
+        mThumbnailDownloader.setThumbnailDownloadListener((target, thumbnail) -> {
+            //使用新下载的Bitmap来设置PhotoHolder的Drawable
+            Drawable drawable = new BitmapDrawable(getResources(), thumbnail);
+            target.bindDrawabe(drawable);
+        });
         mThumbnailDownloader.start();
         //getLooper()方法必须在start()方法之后调用
         mThumbnailDownloader.getLooper();
@@ -60,6 +70,13 @@ public class PhotoGalleryFragment extends Fragment {
         mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         setupAdapter();
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        //视图销毁时，调用清理方法
+        mThumbnailDownloader.clearQueue();
     }
 
     @Override

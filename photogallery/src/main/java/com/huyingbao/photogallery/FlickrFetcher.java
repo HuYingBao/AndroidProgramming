@@ -22,6 +22,13 @@ import java.util.List;
 public class FlickrFetcher {
     private static final String TAG = "FlickrFetcher";
 
+    /**
+     * 根据url获取对应的数据
+     *
+     * @param urlSpec
+     * @return
+     * @throws IOException
+     */
     public byte[] getUrlBytes(String urlSpec) throws IOException {
         //创建Url对象
         URL url = new URL(urlSpec);
